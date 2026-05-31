@@ -1,0 +1,37 @@
+---
+title: "Understanding Database Indexing"
+description: "A practical guide to database indexes, composite keys, and query performance."
+pubDate: 2024-11-15
+---
+
+## What Is a Database Index?
+
+An index is a data structure that improves the speed of data retrieval at the cost of additional storage and write overhead. Think of it as the index at the back of a textbook - instead of reading every page, you go directly to the reference.
+
+<Callout type="info">
+  B-tree indexes are the default in most relational databases including
+  PostgreSQL, MySQL, and SQLite. They support equality and range queries
+  efficiently.
+</Callout>
+
+## When to Use a Composite Index
+
+Composite indexes cover multiple columns. The order of columns matters - the index is most effective when queries filter on the leftmost columns first.
+
+<TabGroup tabs={["PostgreSQL", "MySQL", "SQLite"]}>
+  <div>
+    ```sql
+    CREATE INDEX idx_user_created ON orders(user_id, created_at DESC);
+    ```
+  </div>
+  <div>
+    ```sql
+    CREATE INDEX idx_user_created ON orders (user_id, created_at DESC);
+    ```
+  </div>
+  <div>
+    ```sql
+    CREATE INDEX idx_user_created ON orders(user_id, created_at DESC);
+    ```
+  </div>
+</TabGroup>

@@ -1,0 +1,183 @@
+/* Callout */
+.callout {
+  margin: 1.5em 0;
+  padding: 1em 1.25em;
+  border-radius: 8px;
+  border-left: 4px solid;
+}
+
+.callout-label {
+  display: block;
+  margin-bottom: 0.5em;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.callout-info {
+  background: #eef4ff;
+  border-color: #3b82f6;
+  color: #1e3a5f;
+}
+
+.callout-warning {
+  background: #fff8e6;
+  border-color: #f59e0b;
+  color: #78350f;
+}
+
+.callout-danger {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #7f1d1d;
+}
+
+.callout-tip {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #064e3b;
+}
+
+/* Code block */
+.code-block-wrapper {
+  position: relative;
+  margin: 1.5em 0;
+}
+
+.code-block-lang-label {
+  position: absolute;
+  top: 0.5em;
+  right: 0.75em;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgb(var(--gray));
+  opacity: 0.8;
+}
+
+.code-block-wrapper pre {
+  margin: 0;
+  padding-top: 2em;
+}
+
+/* Inline code */
+.inline-code {
+  padding: 0.15em 0.4em;
+  background-color: rgb(var(--gray-light));
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Tab group (CSS-only — no JS hydration) */
+.tab-group {
+  margin: 1.5em 0;
+  border: 1px solid rgb(var(--gray-light));
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tab-list {
+  display: flex;
+  gap: 0;
+  background: rgb(var(--gray-light));
+  border-bottom: 1px solid rgb(var(--gray-light));
+}
+
+.tab-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tab-label {
+  flex: 1;
+  padding: 0.75em 1em;
+  text-align: center;
+  cursor: pointer;
+  font: inherit;
+  color: rgb(var(--gray-dark));
+  transition: background 0.15s ease;
+}
+
+.tab-label:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.tab-input:checked + .tab-label {
+  background: #fff;
+  font-weight: 700;
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.tab-panels {
+  background: #fff;
+}
+
+.tab-panel {
+  display: none;
+  padding: 1.25em;
+}
+
+.tab-panel pre {
+  margin: 0;
+}
+
+/* Show the panel matching the checked radio (supports up to 6 tabs) */
+.tab-group:has(.tab-list input:nth-child(1):checked) .tab-panel[data-tab-index="0"],
+.tab-group:has(.tab-list input:nth-child(3):checked) .tab-panel[data-tab-index="1"],
+.tab-group:has(.tab-list input:nth-child(5):checked) .tab-panel[data-tab-index="2"],
+.tab-group:has(.tab-list input:nth-child(7):checked) .tab-panel[data-tab-index="3"],
+.tab-group:has(.tab-list input:nth-child(9):checked) .tab-panel[data-tab-index="4"],
+.tab-group:has(.tab-list input:nth-child(11):checked) .tab-panel[data-tab-index="5"] {
+  display: block;
+}
+
+/* Image figure */
+.image-figure {
+  margin: 1.5em 0;
+}
+
+.image-figure img {
+  display: block;
+  margin: 0 auto;
+}
+
+.image-figure figcaption {
+  margin-top: 0.75em;
+  text-align: center;
+  font-size: 0.9em;
+  color: rgb(var(--gray));
+}
+
+/* Diagram */
+.diagram {
+  margin: 2em 0;
+  padding: 1.25em;
+  border: 1px dashed rgb(var(--gray-light));
+  border-radius: 8px;
+  background: rgba(var(--gray-light), 0.3);
+}
+
+.diagram-title {
+  margin: 0 0 1em;
+  font-weight: 700;
+  text-align: center;
+  color: rgb(var(--black));
+}
+
+.diagram-body {
+  overflow-x: auto;
+}
+
+.diagram-body img {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.diagram-caption {
+  margin: 1em 0 0;
+  text-align: center;
+  font-size: 0.9em;
+  color: rgb(var(--gray));
+}
