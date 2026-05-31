@@ -1,0 +1,189 @@
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+###############################################################################
+# Health
+###############################################################################
+
+### Health check
+GET {{baseUrl}}/health
+
+###############################################################################
+# Users
+###############################################################################
+
+### List all users
+GET {{baseUrl}}/api/users
+
+### Get user by id
+GET {{baseUrl}}/api/users/1
+
+### Create user
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "email": "lepaul@example.com",
+  "name": "lePaul"
+}
+
+### Update user
+PATCH {{baseUrl}}/api/users/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Alice Smith",
+  "email": "alice.smith@example.com"
+}
+
+### Delete user
+DELETE {{baseUrl}}/api/users/1
+
+###############################################################################
+# Projects
+###############################################################################
+
+### List all projects
+GET {{baseUrl}}/api/projects
+
+### Get project by id (with owner and tasks)
+GET {{baseUrl}}/api/projects/1
+
+### Get project with todo tasks (nested query)
+GET {{baseUrl}}/api/projects/1/with-todo-tasks
+
+### Get project task stats
+GET {{baseUrl}}/api/projects/1/stats
+
+### Create project
+POST {{baseUrl}}/api/projects
+Content-Type: {{contentType}}
+
+{
+  "name": "My App",
+  "description": "A sample project",
+  "ownerId": 1
+}
+
+### Create project with default tasks (transaction)
+POST {{baseUrl}}/api/projects/with-default-tasks
+Content-Type: {{contentType}}
+
+{
+  "name": "Sprint Board",
+  "ownerId": 1,
+  "defaultTasks": ["Setup repo", "Write API", "Add tests"]
+}
+
+### Update project
+PATCH {{baseUrl}}/api/projects/1
+Content-Type: {{contentType}}
+
+{
+  "name": "My App v2",
+  "description": "Updated description"
+}
+
+### Delete project
+DELETE {{baseUrl}}/api/projects/1
+
+###############################################################################
+# Tasks
+###############################################################################
+
+### List all tasks
+GET {{baseUrl}}/api/tasks
+
+### List tasks by project
+GET {{baseUrl}}/api/tasks?projectId=1
+
+### Get task by id
+GET {{baseUrl}}/api/tasks/1
+
+### Create task
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
+
+{
+  "title": "Implement login",
+  "projectId": 1,
+  "assigneeId": 1,
+  "priority": 2,
+  "description": "OAuth + session",
+  "dueDate": "2026-06-15T00:00:00.000Z"
+}
+
+### Update task
+PATCH {{baseUrl}}/api/tasks/1
+Content-Type: {{contentType}}
+
+{
+  "title": "Implement login flow",
+  "priority": 3,
+  "assigneeId": 1
+}
+
+### Update task status only
+PATCH {{baseUrl}}/api/tasks/1/status
+Content-Type: {{contentType}}
+
+{
+  "status": "in_progress"
+}
+
+### Mark task done
+PATCH {{baseUrl}}/api/tasks/1/status
+Content-Type: {{contentType}}
+
+{
+  "status": "done"
+}
+
+### Move tasks to another project
+POST {{baseUrl}}/api/tasks/move
+Content-Type: {{contentType}}
+
+{
+  "taskIds": [1, 2, 3],
+  "targetProjectId": 2
+}
+
+### Attach tag to task
+POST {{baseUrl}}/api/tasks/1/tags/1
+
+### Detach tag from task
+DELETE {{baseUrl}}/api/tasks/1/tags/1
+
+### Delete task
+DELETE {{baseUrl}}/api/tasks/1
+
+###############################################################################
+# Tags
+###############################################################################
+
+### List all tags
+GET {{baseUrl}}/api/tags
+
+### Get tag by id (with linked tasks)
+GET {{baseUrl}}/api/tags/1
+
+### Create tag
+POST {{baseUrl}}/api/tags
+Content-Type: {{contentType}}
+
+{
+  "name": "bug",
+  "color": "#e53935"
+}
+
+### Update tag
+PATCH {{baseUrl}}/api/tags/1
+Content-Type: {{contentType}}
+
+{
+  "name": "critical-bug",
+  "color": "#b71c1c"
+}
+
+### Delete tag
+DELETE {{baseUrl}}/api/tags/1
