@@ -1,0 +1,171 @@
+@base_url = http://localhost:3000
+
+### Users
+
+GET {{base_url}}/api/users
+Content-Type: application/json
+
+###
+GET {{base_url}}/api/users/1
+Content-Type: application/json
+
+###
+POST {{base_url}}/api/users
+Content-Type: application/json
+
+{
+  "username": "dave",
+  "password": "password123"
+}
+
+###
+PUT {{base_url}}/api/users/1
+Content-Type: application/json
+
+{
+  "username": "alice",
+  "password": "new-password"
+}
+
+###
+PATCH {{base_url}}/api/users/1
+Content-Type: application/json
+
+{
+  "username": "alice-updated"
+}
+
+###
+DELETE {{base_url}}/api/users/3
+Content-Type: application/json
+
+### Customers
+
+GET {{base_url}}/api/customers
+Content-Type: application/json
+
+###
+GET {{base_url}}/api/customers/1
+Content-Type: application/json
+
+###
+GET {{base_url}}/api/customers/1/orders
+Content-Type: application/json
+
+###
+POST {{base_url}}/api/customers
+Content-Type: application/json
+
+{
+  "email": "dave@example.com"
+}
+
+###
+PUT {{base_url}}/api/customers/1
+Content-Type: application/json
+
+{
+  "email": "alice.updated@example.com"
+}
+
+###
+PATCH {{base_url}}/api/customers/1
+Content-Type: application/json
+
+{
+  "email": "alice@patch.example.com"
+}
+
+###
+DELETE {{base_url}}/api/customers/3
+Content-Type: application/json
+
+### Orders
+
+GET {{base_url}}/api/orders
+Content-Type: application/json
+
+###
+GET {{base_url}}/api/orders/pending-totals
+Content-Type: application/json
+
+###
+GET {{base_url}}/api/orders/1
+Content-Type: application/json
+
+###
+GET {{base_url}}/api/orders/1/items
+Content-Type: application/json
+
+###
+POST {{base_url}}/api/orders
+Content-Type: application/json
+
+{
+  "customer_id": 2,
+  "status": "pending"
+}
+
+###
+PUT {{base_url}}/api/orders/1
+Content-Type: application/json
+
+{
+  "customer_id": 1,
+  "status": "shipped"
+}
+
+###
+PATCH {{base_url}}/api/orders/1
+Content-Type: application/json
+
+{
+  "status": "delivered"
+}
+
+###
+DELETE {{base_url}}/api/orders/4
+Content-Type: application/json
+
+### Order items
+
+GET {{base_url}}/api/order-items
+Content-Type: application/json
+
+###
+GET {{base_url}}/api/order-items/1
+Content-Type: application/json
+
+###
+POST {{base_url}}/api/order-items
+Content-Type: application/json
+
+{
+  "order_id": 2,
+  "product_sku": "SKU-CASE-003",
+  "quantity": 1,
+  "unit_price_cents": 1999
+}
+
+###
+PUT {{base_url}}/api/order-items/1
+Content-Type: application/json
+
+{
+  "order_id": 1,
+  "product_sku": "SKU-WIDGET-001",
+  "quantity": 3,
+  "unit_price_cents": 1299
+}
+
+###
+PATCH {{base_url}}/api/order-items/1
+Content-Type: application/json
+
+{
+  "quantity": 5
+}
+
+###
+DELETE {{base_url}}/api/order-items/8
+Content-Type: application/json
