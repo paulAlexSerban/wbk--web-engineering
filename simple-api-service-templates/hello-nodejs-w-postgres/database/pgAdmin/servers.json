@@ -6,8 +6,8 @@
       "Host": "database",
       "Port": 5432,
       "MaintenanceDB": "postgres",
-      "Username": "admin",
-      "Password": "admin",
+      "Username": "devuser",
+      "Password": "changeme",
       "SSLMode": "prefer",
       "Comment": "Primary PostgreSQL server"
     }

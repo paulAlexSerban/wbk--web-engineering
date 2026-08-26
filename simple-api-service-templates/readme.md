@@ -14,7 +14,7 @@ Each template is a minimal **API + database**. Every template is wrapped in the 
 |         | PostgreSQL | MongoDB | SQLite | MariaDB | Redis |
 | ------- | ---------- | ------- | ------ | ------- | ----- |
 | Node.js | ✅          | ❌       | ❌      | ❌       | ❌     |
-| Python  | ❌          | ❌       | ✅      | ❌       | ❌     |
+| Python  | ❌          | ❌       | ❌      | ❌       | ❌     |
 | Ruby    | ❌          | ❌       | ❌      | ❌       | ❌     |
 | Rust    | ❌          | ❌       | ❌      | ❌       | ❌     |
 | Go      | ❌          | ❌       | ❌      | ❌       | ❌     |

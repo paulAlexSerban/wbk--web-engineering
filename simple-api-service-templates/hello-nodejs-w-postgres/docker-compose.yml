@@ -11,6 +11,7 @@ services:
   # | Node.js API Service                                               | 
   # ---------------------------------------------------------------------
   api-service:
+    container_name: ${COMPOSE_PROJECT_NAME}_api_service
     build:
       context: ./${API_SERVICE_PROJECT_PATH}
       dockerfile: Dockerfile.dev
@@ -33,13 +34,17 @@ services:
   # ---------------------------------------------------------------------
   database:
     image: postgres:18
-    env_file:
-      - ./.env
+    container_name: ${COMPOSE_PROJECT_NAME}_postgres
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
     ports:
-      - "5432:5432"
+      - "${DATABASE_PORT:-5432}:5432"
     volumes:
       - database-data:/var/lib/postgresql/data
       - ./${DATABASE_PROJECT_PATH}/seeds/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
     networks:
       - base-api-service-network
 
@@ -47,20 +52,29 @@ services:
   # | PgAdmin                                                           |
   # ---------------------------------------------------------------------
   pgadmin:
-    image:
-      dpage/pgadmin4
+    image: dpage/pgadmin4
     # ensure that the CONTAINER user id and group id are the same as the HOST user id and group id
     # without this, the container will fail to write files to the host volume
     # user: "${HOST_USER_ID}:${HOST_GROUP_ID}"
+    container_name: ${COMPOSE_PROJECT_NAME}_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
     ports:
-      - 15433:8080
-    env_file:
-      - ./.env
+      - "${PGADMIN_PORT:-5050}:80"
     depends_on:
       - database
+    restart: always
+    entrypoint: >
+      /bin/sh -c "
+      echo 'database:5432:*:${DATABASE_USER}:${DATABASE_PASSWORD}' > /tmp/pgpass &&
+      chmod 600 /tmp/pgpass &&
+      /entrypoint.sh
+      "
     networks:
       - base-api-service-network
     volumes:
       # - ./database/.tmp-data/${PROJECT_NAME}-data/:/var/lib/pgadmin/
       - ./${DATABASE_PROJECT_PATH}/pgAdmin/config_distro.py:/pgadmin4/config_distro.py
-      - ./${DATABASE_PROJECT_PATH}/pgAdmin/servers.json:/pgadmin4/servers.json
+      - ./${DATABASE_PROJECT_PATH}/pgAdmin/servers.json:/pgadmin4/servers.json:ro
