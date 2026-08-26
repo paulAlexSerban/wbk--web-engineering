@@ -1,48 +1,47 @@
 ---
 networks:
-  base-nodejs-network:
+  base-api-service-network:
     driver: bridge
 
 volumes:
-  dev-db-data:
+  database-data:
 
 services:
   # ---------------------------------------------------------------------
   # | Node.js API Service                                               | 
   # ---------------------------------------------------------------------
-  nodejs-api-service:
+  api-service:
     build:
-      context: ${API_PROJECT_PATH}
+      context: ./${API_SERVICE_PROJECT_PATH}
       dockerfile: Dockerfile.dev
       args:
-        - API_PROJECT_PATH=${API_PROJECT_PATH}
         - NODE_PORT=${NODE_PORT}
     ports:
-      - "3000:${NODE_PORT}"
+      - "3002:${NODE_PORT}"
     depends_on:
-      - postgresql_database
+      - database
     env_file:
       - ./.env
     volumes:
       - /usr/src/app/node_modules # Avoids overwriting node_modules with local volume
-      - ./${API_PROJECT_PATH}:/usr/src/app
+      - ./${API_SERVICE_PROJECT_PATH}:/usr/src/app
     networks:
-      - base-nodejs-network
+      - base-api-service-network
 
   # ---------------------------------------------------------------------
   # | Postgres Database                                                 |
   # ---------------------------------------------------------------------
-  postgresql_database:
-    image: postgres:13-alpine
+  database:
+    image: postgres:18
     env_file:
       - ./.env
     ports:
       - "5432:5432"
     volumes:
-      - dev-db-data:/var/lib/postgresql/data
-      - ./database/initialization/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - database-data:/var/lib/postgresql/data
+      - ./${DATABASE_PROJECT_PATH}/seeds/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - base-nodejs-network
+      - base-api-service-network
 
   # ---------------------------------------------------------------------
   # | PgAdmin                                                           |
@@ -54,14 +53,14 @@ services:
     # without this, the container will fail to write files to the host volume
     # user: "${HOST_USER_ID}:${HOST_GROUP_ID}"
     ports:
-      - 15433:80
+      - 15433:8080
     env_file:
       - ./.env
     depends_on:
-      - postgresql_database
+      - database
     networks:
-      - base-nodejs-network
+      - base-api-service-network
     volumes:
       # - ./database/.tmp-data/${PROJECT_NAME}-data/:/var/lib/pgadmin/
-      - ./database/pgAdmin/config_distro.py:/pgadmin4/config_distro.py
-      - ./database/pgAdmin/servers.json:/pgadmin4/servers.json
+      - ./${DATABASE_PROJECT_PATH}/pgAdmin/config_distro.py:/pgadmin4/config_distro.py
+      - ./${DATABASE_PROJECT_PATH}/pgAdmin/servers.json:/pgadmin4/servers.json
