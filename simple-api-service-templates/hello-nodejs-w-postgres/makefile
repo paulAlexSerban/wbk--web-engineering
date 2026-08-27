@@ -14,10 +14,13 @@ export DOCKER_BUILDKIT := 1
 export COMPOSE_DOCKER_CLI_BUILD := 1
 
 COMPOSE := docker compose --env-file .env --file $(COMPOSE_FILE)
+
 COMPOSE_ALL := $(COMPOSE) \
-	--file infrastructure/local/docker-compose.observability.yml \
 	--file infrastructure/local/docker-compose.performance.yml \
 	--file infrastructure/local/docker-compose.notebook.yml
+
+COMPOSE_OBS := $(COMPOSE) \
+	--file infrastructure/local/docker-compose.observability.yml
 
 local_base_build:
 	$(COMPOSE) --profile build-only build local-base
@@ -32,10 +35,10 @@ compose_down_clean: backup_db
 	$(COMPOSE_ALL) down -v
 
 observability_up:
-	$(COMPOSE_ALL) up -d prometheus loki promtail grafana
+	$(COMPOSE_OBS) up -d clickhouse otel-collector grafana
 
 observability_down:
-	$(COMPOSE_ALL) stop prometheus loki promtail grafana
+	$(COMPOSE_OBS) stop clickhouse otel-collector grafana
 
 notebook_up:
 	$(COMPOSE_ALL) up -d --build jupyter

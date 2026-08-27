@@ -33,7 +33,7 @@ Docker Compose is the single entrypoint. It brings up the template runtime (API 
 | Data seed script       | One-shot seeder service / SQL (or equivalent)      | Loads known sample data into the database so the API has a predictable starting state   |
 | API test setup         | Jupyter notebooks (Postman-like HTTP checks)       | Functional / contract tests against live endpoints                                      |
 | Performance test setup | Load / stress test config aimed at the running API | Measures latency and throughput under load                                              |
-| Observability          | Prometheus, Grafana, Loki                          | Scrapes metrics, collects logs, and dashboards the running service                      |
+| Observability          | OpenTelemetry Collector, ClickHouse, Grafana       | Receives OTLP metrics and logs, stores them in ClickHouse, and dashboards the running service |
 
 ## Overview diagram
 
@@ -56,17 +56,16 @@ flowchart LR
         end
 
         subgraph Observability["Observability"]
-            Prom["Prometheus"]
-            Loki["Loki"]
+            Collector["OTel Collector"]
+            CH["ClickHouse"]
             Graf["Grafana"]
         end
 
         Seed -->|writes sample data| DB
         ApiTests -->|HTTP requests| API
         Perf -->|load / stress| API
-        API -->|metrics| Prom
-        API -->|logs| Loki
-        Prom --> Graf
-        Loki --> Graf
+        API -->|OTLP metrics + logs| Collector
+        Collector --> CH
+        CH --> Graf
     end
 ```

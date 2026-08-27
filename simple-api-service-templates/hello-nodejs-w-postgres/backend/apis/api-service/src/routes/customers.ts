@@ -1,5 +1,5 @@
 import express, { Router, Request, Response } from "express";
-import { asyncHandler, parseId } from "./asyncHandler";
+import { asyncHandler, parseId } from "../middleware/asyncHandler";
 import {
   listCustomers,
   findCustomerById,
@@ -60,13 +60,13 @@ router.get(
 router.post(
   "/",
   asyncHandler(async (req: Request, res: Response) => {
-    const { email } = req.body;
-    if (!email) {
-      res.status(400).json({ error: "email is required" });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400).json({ error: "email and password are required" });
       return;
     }
 
-    const customer = await createCustomer({ email });
+    const customer = await createCustomer({ email, password });
     res.status(201).json(customer);
   }),
 );
@@ -80,13 +80,13 @@ router.put(
       return;
     }
 
-    const { email } = req.body;
-    if (!email) {
-      res.status(400).json({ error: "email is required" });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400).json({ error: "email and password are required" });
       return;
     }
 
-    const customer = await updateCustomer(id, { email });
+    const customer = await updateCustomer(id, { email, password });
     if (!customer) {
       res.status(404).json({ error: "Customer not found" });
       return;

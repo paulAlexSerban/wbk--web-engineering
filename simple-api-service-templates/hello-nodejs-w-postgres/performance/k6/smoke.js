@@ -1,32 +1,48 @@
-import http from 'k6/http';
-import { check, sleep } from 'k6';
-
-const BASE_URL = __ENV.API_BASE_URL || 'http://api-service:5000/api';
+import { signupFlow, checkoutFlow, bulkFlow, errorFlow, productFlow } from './helpers/flows.js';
 
 export const options = {
-  vus: 2,
-  duration: '20s',
+  scenarios: {
+    products: {
+      executor: 'shared-iterations',
+      vus: 1,
+      iterations: 2,
+      exec: 'productFlow',
+    },
+    signup: {
+      executor: 'shared-iterations',
+      vus: 1,
+      iterations: 2,
+      exec: 'signupFlow',
+    },
+    checkout: {
+      executor: 'shared-iterations',
+      vus: 1,
+      iterations: 2,
+      exec: 'checkoutFlow',
+    },
+    bulk: {
+      executor: 'shared-iterations',
+      vus: 1,
+      iterations: 1,
+      exec: 'bulkFlow',
+    },
+    errors: {
+      executor: 'shared-iterations',
+      vus: 1,
+      iterations: 1,
+      exec: 'errorFlow',
+    },
+  },
   thresholds: {
     http_req_failed: ['rate<0.01'],
     http_req_duration: ['p(95)<500'],
+    checks: ['rate>0.99'],
+    'http_req_duration{scenario:products}': ['p(95)<500'],
+    'http_req_duration{scenario:signup}': ['p(95)<500'],
+    'http_req_duration{scenario:checkout}': ['p(95)<500'],
+    'http_req_duration{scenario:bulk}': ['p(95)<500'],
+    'http_req_duration{scenario:errors}': ['p(95)<500'],
   },
 };
 
-export default function () {
-  const hello = http.get(`${BASE_URL}/hello`);
-  check(hello, { 'hello status 200': (r) => r.status === 200 });
-
-  const users = http.get(`${BASE_URL}/users`);
-  check(users, { 'users status 200': (r) => r.status === 200 });
-
-  const customers = http.get(`${BASE_URL}/customers`);
-  check(customers, { 'customers status 200': (r) => r.status === 200 });
-
-  const orders = http.get(`${BASE_URL}/orders`);
-  check(orders, { 'orders status 200': (r) => r.status === 200 });
-
-  const pending = http.get(`${BASE_URL}/orders/pending-totals`);
-  check(pending, { 'pending-totals status 200': (r) => r.status === 200 });
-
-  sleep(1);
-}
+export { signupFlow, checkoutFlow, bulkFlow, errorFlow, productFlow };

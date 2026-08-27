@@ -1,5 +1,5 @@
 import express, { Router, Request, Response } from "express";
-import { asyncHandler, parseId } from "./asyncHandler";
+import { asyncHandler, parseId } from "../middleware/asyncHandler";
 import {
   listOrderItems,
   findOrderItemById,
@@ -40,17 +40,17 @@ router.get(
 router.post(
   "/",
   asyncHandler(async (req: Request, res: Response) => {
-    const { order_id, product_sku, quantity, unit_price_cents } = req.body;
-    if (!order_id || !product_sku || quantity === undefined || unit_price_cents === undefined) {
+    const { order_id, product_id, quantity, unit_price_cents } = req.body;
+    if (!order_id || !product_id || quantity === undefined || unit_price_cents === undefined) {
       res.status(400).json({
-        error: "order_id, product_sku, quantity, and unit_price_cents are required",
+        error: "order_id, product_id, quantity, and unit_price_cents are required",
       });
       return;
     }
 
     const item = await createOrderItem({
       order_id,
-      product_sku,
+      product_id,
       quantity,
       unit_price_cents,
     });
@@ -67,17 +67,17 @@ router.put(
       return;
     }
 
-    const { order_id, product_sku, quantity, unit_price_cents } = req.body;
-    if (!order_id || !product_sku || quantity === undefined || unit_price_cents === undefined) {
+    const { order_id, product_id, quantity, unit_price_cents } = req.body;
+    if (!order_id || !product_id || quantity === undefined || unit_price_cents === undefined) {
       res.status(400).json({
-        error: "order_id, product_sku, quantity, and unit_price_cents are required",
+        error: "order_id, product_id, quantity, and unit_price_cents are required",
       });
       return;
     }
 
     const item = await updateOrderItem(id, {
       order_id,
-      product_sku,
+      product_id,
       quantity,
       unit_price_cents,
     });
