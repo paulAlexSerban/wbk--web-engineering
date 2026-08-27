@@ -18,6 +18,13 @@ Tables and types follow the JS-to-PostgreSQL workbook: standalone `users`, plus 
 
 ## Features
 
+### Health and metrics
+
+- `/health`
+  - GET - Liveness check (`{ "status": "ok" }`).
+- `/metrics`
+  - GET - Prometheus text metrics (process defaults plus `http_request_duration_seconds`).
+
 ### Hello API
 
 - `/api/hello/`

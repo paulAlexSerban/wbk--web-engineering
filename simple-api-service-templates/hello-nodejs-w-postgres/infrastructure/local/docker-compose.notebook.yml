@@ -1,0 +1,24 @@
+---
+networks:
+  base-api-service-network:
+
+services:
+  jupyter:
+    build:
+      context: ./notebooks
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME}_jupyter
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      JUPYTER_TOKEN: ${JUPYTER_TOKEN:-changeme}
+      API_BASE_URL: http://api-service:${NODE_PORT}/api
+    ports:
+      - "${JUPYTER_PORT:-8888}:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    working_dir: /home/jovyan/work
+    depends_on:
+      api-service:
+        condition: service_healthy
+    networks:
+      - base-api-service-network

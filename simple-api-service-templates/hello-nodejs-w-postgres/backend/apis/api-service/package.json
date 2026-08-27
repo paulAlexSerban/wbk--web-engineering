@@ -3,15 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "main": "dist/bin/www.js",
+  "packageManager": "pnpm@11.5.0",
   "scripts": {
-    "develop": "concurrently \"yarn tsc --watch\" \"nodemon -q /dist/bin/www.js\"",
+    "develop": "concurrently \"tsc --watch\" \"nodemon -q dist/bin/www.js\"",
     "start": "node ./dist/bin/www.js",
-    "build": "yarn tsc",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\"",
     "test:watch": "echo \"Error: no test specified\"",
     "test:coverage": "echo \"Error: no test specified\""
   },
   "dependencies": {
+    "@prometheus-io/client": "^0.16.0",
     "@types/cookie-parser": "^1.4.6",
     "@types/debug": "^4.1.12",
     "@types/express": "^4.17.21",
@@ -28,6 +30,5 @@
     "nodemon": "^2.0.22",
     "pg": "^8.11.3",
     "typescript": "^5.2.2"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
 }

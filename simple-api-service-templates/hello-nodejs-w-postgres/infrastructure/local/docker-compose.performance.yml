@@ -1,0 +1,17 @@
+---
+networks:
+  api-service-network:
+
+services:
+  k6:
+    image: grafana/k6:0.57.0
+    container_name: ${COMPOSE_PROJECT_NAME}_k6
+    environment:
+      API_BASE_URL: http://api-service:${NODE_PORT}/api
+    volumes:
+      - ../../performance/k6:/scripts:ro
+    depends_on:
+      api-service:
+        condition: service_healthy
+    networks:
+      - api-service-network

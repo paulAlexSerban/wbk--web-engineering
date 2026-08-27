@@ -1,29 +1,24 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Express } from 'express';
 import cookieParser from 'cookie-parser';
-import logger from 'morgan';
 import routes from './routes';
+import {
+    observabilityMiddleware,
+    healthHandler,
+    metricsHandler,
+    errorHandler,
+} from './middleware';
 
 const app: Express = express();
 
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(observabilityMiddleware);
+
+app.get('/health', healthHandler);
+app.get('/metrics', metricsHandler);
 
 app.use('/api', routes);
-
-interface CustomError extends Error {
-    statusCode?: number;
-    value?: string;
-    errors?: Record<string, { message: string }>;
-    code?: number;
-}
-
-const errorHandler = (err: CustomError, req: Request, res: Response, next: NextFunction) => {
-    console.log(err); // Enhanced logging
-    res.json(err);
-};
-
 app.use(errorHandler);
 
 export default app;
