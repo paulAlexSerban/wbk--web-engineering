@@ -1,0 +1,109 @@
+---
+networks:
+  api-service-network:
+    driver: bridge
+
+volumes:
+  database-data:
+
+services:
+  local-base:
+      image: ${PROJECT_NAME}-local-base:latest
+      build:
+          context: ../..
+          dockerfile: base.Dockerfile
+      profiles:
+          - build-only
+
+  api-service:
+    container_name: ${PROJECT_NAME}_api_service
+    build:
+      context: ../../backend/apis/api-service
+      dockerfile: Dockerfile
+      args:
+        - PROJECT_NAME=${PROJECT_NAME}
+        - LOCAL_BASE_IMAGE=${PROJECT_NAME}-local-base:latest
+        - NODE_PORT=${NODE_PORT}
+    ports:
+      - "3002:${NODE_PORT}"
+    depends_on:
+      - database
+    env_file:
+      - ../../.env
+    environment:
+      CI: "true"
+      PORT: ${NODE_PORT}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_HOST: database
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_PORT: "5432"
+    volumes:
+      - ../../backend/apis/api-service:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:'+(process.env.PORT||5000)+'/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks:
+      - api-service-network
+
+  database:
+    image: postgres:18
+    container_name: ${PROJECT_NAME}_postgres
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    volumes:
+      - database-data:/var/lib/postgresql
+      - ../../database/seeds/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ../../database/seeds/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    restart: always
+    networks:
+      - api-service-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    # ensure that the CONTAINER user id and group id are the same as the HOST user id and group id
+    # without this, the container will fail to write files to the host volume
+    # user: "${HOST_USER_ID}:${HOST_GROUP_ID}"
+    container_name: ${PROJECT_NAME}_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+      PGADMIN_REPLACE_SERVERS_ON_STARTUP: "True"
+    env_file:
+      - ../../.env
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      - database
+    restart: always
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "database:5432:*:${DATABASE_USER}:${DATABASE_PASSWORD}" > /tmp/pgpass
+        chown 5050:5050 /tmp/pgpass
+        chmod 600 /tmp/pgpass
+        exec /entrypoint.sh "$$@"
+      - --
+    networks:
+      - api-service-network
+    volumes:
+      # - ./database/.tmp-data/${PROJECT_NAME}-data/:/var/lib/pgadmin/
+       - ../../database/pgAdmin/config_distro.py:/pgadmin4/config_distro.py
+       - ../../database/pgAdmin/servers.json:/pgadmin4/servers.json:ro
