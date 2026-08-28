@@ -1,5 +1,5 @@
 {
-  "name": "@wbk--fullstack/hello-nodejs-w-postgres-api",
+  "name": "@wbk--fullstack/nodejs-w-postgres--ts-api",
   "version": "0.0.0",
   "private": true,
   "main": "dist/bin/www.js",

@@ -7,9 +7,6 @@ volumes:
   database-data:
 
 services:
-  # ---------------------------------------------------------------------
-  # | Local Base Image                                                  |
-  # ---------------------------------------------------------------------
   local-base:
       image: ${PROJECT_NAME}-local-base:latest
       build:
@@ -17,9 +14,7 @@ services:
           dockerfile: base.Dockerfile
       profiles:
           - build-only
-  # ---------------------------------------------------------------------
-  # | Node.js API Service                                               |
-  # ---------------------------------------------------------------------
+
   api-service:
     container_name: ${PROJECT_NAME}_api_service
     build:
@@ -62,9 +57,6 @@ services:
     networks:
       - api-service-network
 
-  # ---------------------------------------------------------------------
-  # | Postgres Database                                                 |
-  # ---------------------------------------------------------------------
   database:
     image: postgres:18
     container_name: ${PROJECT_NAME}_postgres
@@ -82,9 +74,6 @@ services:
     networks:
       - api-service-network
 
-  # ---------------------------------------------------------------------
-  # | PgAdmin                                                           |
-  # ---------------------------------------------------------------------
   pgadmin:
     image: dpage/pgadmin4
     # ensure that the CONTAINER user id and group id are the same as the HOST user id and group id

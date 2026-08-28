@@ -6,8 +6,7 @@ Each template is a minimal **API + database**. Every template is wrapped in the 
 
 ## Templates
 
-- [Hello Node.js with Postgres](hello-nodejs-w-postgres)
-- [Hello Python with SQLite](hello-python-w-sqlite)
+- [Node.js with Postgres (TS)](nodejs-w-postgres--ts)
 
 ## Tech Stack Matrix
 
@@ -27,12 +26,12 @@ The Dev & Test (D&T) harness is the shared local environment that ships with eve
 
 Docker Compose is the single entrypoint. It brings up the template runtime (API + database) plus the harness tools so the same workflow works across languages.
 
-| Piece                  | What it is                                         | What it does                                                                            |
-| ---------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| Infra orchestration    | Docker Compose (+ Makefile wrappers)               | Starts, stops, and wires API, database, seeder, tests, and observability on one network |
-| Data seed script       | One-shot seeder service / SQL (or equivalent)      | Loads known sample data into the database so the API has a predictable starting state   |
-| API test setup         | Jupyter notebooks (Postman-like HTTP checks)       | Functional / contract tests against live endpoints                                      |
-| Performance test setup | Load / stress test config aimed at the running API | Measures latency and throughput under load                                              |
+| Piece                  | What it is                                         | What it does                                                                                  |
+| ---------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Infra orchestration    | Docker Compose (+ Makefile wrappers)               | Starts, stops, and wires API, database, seeder, tests, and observability on one network       |
+| Data seed script       | One-shot seeder service / SQL (or equivalent)      | Loads known sample data into the database so the API has a predictable starting state         |
+| API test setup         | Jupyter notebooks (Postman-like HTTP checks)       | Functional / contract tests against live endpoints                                            |
+| Performance test setup | Load / stress test config aimed at the running API | Measures latency and throughput under load                                                    |
 | Observability          | OpenTelemetry Collector, ClickHouse, Grafana       | Receives OTLP metrics and logs, stores them in ClickHouse, and dashboards the running service |
 
 ## Overview diagram
