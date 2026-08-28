@@ -1,4 +1,4 @@
-import { signupFlow, checkoutFlow, bulkFlow, errorFlow, productFlow } from './lib/flows.js';
+import { signupFlow, checkoutFlow, bulkFlow, errorFlow, productFlow } from './helpers/flows.js';
 
 export const options = {
   scenarios: {
