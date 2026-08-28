@@ -60,14 +60,14 @@ save_db_snapshot:
 
 backup_db: save_db_snapshot
 	docker exec ${COMPOSE_PROJECT_NAME}_postgres \
-		pg_dump -U ${DATABASE_USER} -d ${COMPOSE_PROJECT_NAME} \
+		pg_dump -U ${DATABASE_USER} -d ${DATABASE_NAME} \
 		> database/backup/main.sql
 
 restore_db:
 	@if [ -f database/backup/main.sql ]; then \
 		echo 'RESTORING database'; \
 		docker exec -i ${COMPOSE_PROJECT_NAME}_postgres \
-			psql -U ${DATABASE_USER} -d ${COMPOSE_PROJECT_NAME} \
+			psql -U ${DATABASE_USER} -d ${DATABASE_NAME} \
 			< database/backup/main.sql; \
 		echo 'RESTORED database'; \
 	else \
