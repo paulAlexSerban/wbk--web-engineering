@@ -59,7 +59,7 @@
           "editorType": "sql",
           "format": 0,
           "queryType": "sql",
-          "rawSql": "SELECT\n  toStartOfMinute(Timestamp) AS time,\n  SeverityText AS severity,\n  count() AS log_count\nFROM otel_logs\nWHERE Timestamp BETWEEN $__fromTime AND $__toTime\nGROUP BY time, severity\nORDER BY time",
+          "rawSql": "SELECT\n  toStartOfMinute(Timestamp) AS time,\n  SeverityText AS severity,\n  count() AS log_count\nFROM otel_logs\nWHERE Timestamp BETWEEN $__fromTime AND $__toTime\n  AND SeverityText IN (${severity:singlequote})\nGROUP BY time, severity\nORDER BY time",
           "refId": "A"
         }
       ],
@@ -344,7 +344,7 @@
           "editorType": "sql",
           "format": 2,
           "queryType": "sql",
-          "rawSql": "SELECT\n  Timestamp AS timestamp,\n  SeverityText AS level,\n  ResourceAttributes['service.name'] AS service,\n  LogAttributes['route'] AS route,\n  Body AS body\nFROM otel_logs\nWHERE Timestamp BETWEEN $__fromTime AND $__toTime\nORDER BY Timestamp DESC\nLIMIT 1000",
+          "rawSql": "SELECT\n  Timestamp AS timestamp,\n  SeverityText AS level,\n  ResourceAttributes['service.name'] AS service,\n  LogAttributes['route'] AS route,\n  Body AS body\nFROM otel_logs\nWHERE Timestamp BETWEEN $__fromTime AND $__toTime\n  AND SeverityText IN (${severity:singlequote})\nORDER BY Timestamp DESC\nLIMIT 1000",
           "refId": "A"
         }
       ],
@@ -369,6 +369,24 @@
           "editorType": "sql",
           "format": 1,
           "rawSql": "SELECT DISTINCT ResourceAttributes['service.name'] AS service FROM otel_logs ORDER BY service"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+        "definition": "SELECT DISTINCT SeverityText AS severity FROM otel_logs ORDER BY severity",
+        "includeAll": true,
+        "multi": true,
+        "name": "severity",
+        "options": [],
+        "query": {
+          "editorType": "sql",
+          "format": 1,
+          "rawSql": "SELECT DISTINCT SeverityText AS severity FROM otel_logs ORDER BY severity"
         },
         "refresh": 2,
         "regex": "",
