@@ -1,0 +1,36 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 10000
+  resource:
+    attributes:
+      - key: cluster.name
+        value: ${env:CLUSTER_NAME:-local-dev}
+        action: upsert
+
+exporters:
+  clickhouse:
+    endpoint: tcp://clickhouse:9000?dial_timeout=10s&compress=lz4
+    database: ${CLICKHOUSE_DB}
+    username: ${CLICKHOUSE_USER}
+    password: ${CLICKHOUSE_PASSWORD}
+    create_schema: true
+    logs_table_name: otel_logs
+    traces_table_name: otel_traces
+    ttl: 720h # 30 days retention, enforced by ClickHouse TTL configuration
+    timeout: 10s
+
+service:
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [clickhouse]
