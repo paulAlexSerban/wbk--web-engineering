@@ -40,6 +40,9 @@ observability_up:
 observability_down:
 	$(COMPOSE_OBS) stop loki alloy grafana
 
+observability_down_clean:
+	$(COMPOSE_OBS) down -v
+
 notebook_up:
 	$(COMPOSE_ALL) up -d --build jupyter
 

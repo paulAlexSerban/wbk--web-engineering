@@ -14,6 +14,7 @@
       }
     ]
   },
+  "description": "Pino logs scraped by Alloy from Docker and stored in Loki. level and service are stream labels; route and err.type are parsed from the JSON line.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -30,7 +31,8 @@
       "type": "row"
     },
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Log lines per interval, split by the level label Alloy extracts from Pino JSON.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -52,14 +54,13 @@
         "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
         "tooltip": { "mode": "multi", "sort": "none" }
       },
-      "pluginVersion": "11.5.2",
       "targets": [
         {
-          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-          "editorType": "sql",
-          "format": 0,
-          "queryType": "sql",
-          "rawSql": "SELECT\n  toStartOfMinute(Timestamp) AS time,\n  SeverityText AS severity,\n  count() AS log_count\nFROM otel_logs\nWHERE Timestamp BETWEEN $__fromTime AND $__toTime\n  AND SeverityText IN (${severity:singlequote})\nGROUP BY time, severity\nORDER BY time",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "sum by (level) (count_over_time({service=~\"$service\", level=~\"${severity:pipe}\"}[$__auto]))",
+          "legendFormat": "{{level}}",
+          "queryType": "range",
           "refId": "A"
         }
       ],
@@ -67,7 +68,8 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Total structured logs for the selected service in the current time range.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -87,14 +89,12 @@
         "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
         "textMode": "auto"
       },
-      "pluginVersion": "11.5.2",
       "targets": [
         {
-          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-          "editorType": "sql",
-          "format": 1,
-          "queryType": "sql",
-          "rawSql": "SELECT count() AS total_logs\nFROM otel_logs\nWHERE Timestamp BETWEEN $__fromTime AND $__toTime",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=~\"$service\"}[$__range]))",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
@@ -102,7 +102,8 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Log lines per interval, split by the service label Alloy extracts from Pino JSON.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -124,14 +125,13 @@
         "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
         "tooltip": { "mode": "multi", "sort": "none" }
       },
-      "pluginVersion": "11.5.2",
       "targets": [
         {
-          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-          "editorType": "sql",
-          "format": 0,
-          "queryType": "sql",
-          "rawSql": "SELECT\n  toStartOfMinute(Timestamp) AS time,\n  ResourceAttributes['service.name'] AS service,\n  count() AS log_count\nFROM otel_logs\nWHERE Timestamp BETWEEN $__fromTime AND $__toTime\nGROUP BY time, service\nORDER BY time",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "sum by (service) (count_over_time({service=~\"$service\"}[$__auto]))",
+          "legendFormat": "{{service}}",
+          "queryType": "range",
           "refId": "A"
         }
       ],
@@ -147,7 +147,7 @@
       "type": "row"
     },
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
+      "datasource": { "type": "loki", "uid": "loki" },
       "description": "Error and fatal log counts over time, split by service.",
       "fieldConfig": {
         "defaults": {
@@ -170,14 +170,13 @@
         "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
         "tooltip": { "mode": "multi", "sort": "desc" }
       },
-      "pluginVersion": "11.5.2",
       "targets": [
         {
-          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-          "editorType": "sql",
-          "format": 0,
-          "queryType": "sql",
-          "rawSql": "SELECT\n  toStartOfMinute(Timestamp) AS time,\n  ResourceAttributes['service.name'] AS service,\n  count() AS error_count\nFROM otel_logs\nWHERE SeverityText IN ('error', 'fatal')\n  AND Timestamp BETWEEN $__fromTime AND $__toTime\nGROUP BY time, service\nORDER BY time",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "sum by (service) (count_over_time({service=~\"$service\", level=~\"error|fatal\"}[$__auto]))",
+          "legendFormat": "{{service}}",
+          "queryType": "range",
           "refId": "A"
         }
       ],
@@ -185,12 +184,14 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-      "description": "Aggregated error rate (errors / total logs) for the selected service.",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Aggregated error rate (error and fatal lines / total lines) for the selected service.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
           "mappings": [],
+          "max": 100,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -210,17 +211,15 @@
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "/^error_rate_pct$/", "values": false },
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
         "textMode": "auto"
       },
-      "pluginVersion": "11.5.2",
       "targets": [
         {
-          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-          "editorType": "sql",
-          "format": 1,
-          "queryType": "sql",
-          "rawSql": "SELECT\n  countIf(SeverityText IN ('error', 'fatal')) AS error_count,\n  count() AS total_count,\n  round(error_count / total_count * 100, 2) AS error_rate_pct\nFROM otel_logs\nWHERE ResourceAttributes['service.name'] = '$service'\n  AND Timestamp BETWEEN $__fromTime AND $__toTime",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "sum(count_over_time({service=~\"$service\", level=~\"error|fatal\"}[$__range])) / sum(count_over_time({service=~\"$service\"}[$__range])) * 100",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
@@ -228,8 +227,8 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-      "description": "Error count over time for the selected service, split by error reason (err.type).",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Error count over time for the selected service, split by err.type from the Pino JSON line.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
@@ -251,14 +250,13 @@
         "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
         "tooltip": { "mode": "multi", "sort": "desc" }
       },
-      "pluginVersion": "11.5.2",
       "targets": [
         {
-          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-          "editorType": "sql",
-          "format": 0,
-          "queryType": "sql",
-          "rawSql": "SELECT\n  toStartOfMinute(Timestamp) AS time,\n  ifNull(nullIf(JSONExtractString(LogAttributes['err'], 'type'), ''), 'unknown') AS reason,\n  count() AS error_count\nFROM otel_logs\nWHERE ResourceAttributes['service.name'] = '$service'\n  AND SeverityText IN ('error', 'fatal')\n  AND Timestamp BETWEEN $__fromTime AND $__toTime\nGROUP BY time, reason\nORDER BY time",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "sum by (reason) (count_over_time({service=~\"$service\", level=~\"error|fatal\"} | json reason=\"err.type\" | __error__=\"\" | label_format reason=`{{ or .reason \"unknown\" }}` [$__auto]))",
+          "legendFormat": "{{reason}}",
+          "queryType": "range",
           "refId": "A"
         }
       ],
@@ -266,8 +264,8 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-      "description": "Top 10 routes with the most failures for the selected service, broken down by reason.",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Top 10 routes with the most failures for the selected service, broken down by err.type.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -281,8 +279,9 @@
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "failures" },
+            "matcher": { "id": "byName", "options": "Value" },
             "properties": [
+              { "id": "displayName", "value": "failures" },
               {
                 "id": "custom.cellOptions",
                 "value": { "type": "color-background", "mode": "gradient" }
@@ -299,14 +298,12 @@
         "showHeader": true,
         "sortBy": [{ "desc": true, "displayName": "failures" }]
       },
-      "pluginVersion": "11.5.2",
       "targets": [
         {
-          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-          "editorType": "sql",
-          "format": 1,
-          "queryType": "sql",
-          "rawSql": "SELECT\n  ifNull(nullIf(LogAttributes['route'], ''), 'unknown') AS route,\n  ifNull(nullIf(JSONExtractString(LogAttributes['err'], 'type'), ''), 'unknown') AS reason,\n  count() AS failures\nFROM otel_logs\nWHERE ResourceAttributes['service.name'] = '$service'\n  AND SeverityText IN ('error', 'fatal')\n  AND Timestamp BETWEEN $__fromTime AND $__toTime\nGROUP BY route, reason\nORDER BY failures DESC\nLIMIT 10",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "editorMode": "code",
+          "expr": "topk(10, sum by (route, reason) (count_over_time({service=~\"$service\", level=~\"error|fatal\"} | json route=\"route\", reason=\"err.type\" | __error__=\"\" | label_format route=`{{ or .route \"unknown\" }}`, reason=`{{ or .reason \"unknown\" }}` [$__range])))",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
@@ -322,29 +319,29 @@
       "type": "row"
     },
     {
-      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-      "description": "Raw log stream across all services for the selected time range.",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Raw log stream for the selected service and severities.",
       "fieldConfig": { "defaults": {}, "overrides": [] },
       "gridPos": { "h": 12, "w": 24, "x": 0, "y": 37 },
       "id": 301,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
-        "prettifyLogMessage": false,
+        "prettifyLogMessage": true,
         "showCommonLabels": false,
-        "showLabels": false,
+        "showLabels": true,
         "showTime": true,
         "sortOrder": "Descending",
         "wrapLogMessage": true
       },
-      "pluginVersion": "11.5.2",
       "targets": [
         {
-          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-          "editorType": "sql",
-          "format": 2,
-          "queryType": "sql",
-          "rawSql": "SELECT\n  Timestamp AS timestamp,\n  SeverityText AS level,\n  ResourceAttributes['service.name'] AS service,\n  LogAttributes['route'] AS route,\n  Body AS body\nFROM otel_logs\nWHERE Timestamp BETWEEN $__fromTime AND $__toTime\n  AND SeverityText IN (${severity:singlequote})\nORDER BY Timestamp DESC\nLIMIT 1000",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "direction": "backward",
+          "editorMode": "code",
+          "expr": "{service=~\"$service\", level=~\"${severity:pipe}\"}",
+          "maxLines": 1000,
+          "queryType": "range",
           "refId": "A"
         }
       ],
@@ -354,21 +351,24 @@
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["logs", "observability", "api-service"],
+  "tags": ["logs", "loki", "observability", "api-service"],
   "templating": {
     "list": [
       {
-        "current": {},
-        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-        "definition": "SELECT DISTINCT ResourceAttributes['service.name'] AS service FROM otel_logs ORDER BY service",
-        "includeAll": false,
+        "allValue": ".+",
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "datasource": { "type": "loki", "uid": "loki" },
+        "definition": "label_values(service)",
+        "includeAll": true,
+        "label": "Service",
         "multi": false,
         "name": "service",
         "options": [],
         "query": {
-          "editorType": "sql",
-          "format": 1,
-          "rawSql": "SELECT DISTINCT ResourceAttributes['service.name'] AS service FROM otel_logs ORDER BY service"
+          "label": "service",
+          "refId": "LokiVariableQueryEditor-VariableQuery",
+          "stream": "",
+          "type": 1
         },
         "refresh": 2,
         "regex": "",
@@ -376,17 +376,20 @@
         "type": "query"
       },
       {
+        "allValue": ".+",
         "current": { "selected": true, "text": "All", "value": "$__all" },
-        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse" },
-        "definition": "SELECT DISTINCT SeverityText AS severity FROM otel_logs ORDER BY severity",
+        "datasource": { "type": "loki", "uid": "loki" },
+        "definition": "label_values(level)",
         "includeAll": true,
+        "label": "Severity",
         "multi": true,
         "name": "severity",
         "options": [],
         "query": {
-          "editorType": "sql",
-          "format": 1,
-          "rawSql": "SELECT DISTINCT SeverityText AS severity FROM otel_logs ORDER BY severity"
+          "label": "level",
+          "refId": "LokiVariableQueryEditor-VariableQuery",
+          "stream": "",
+          "type": 1
         },
         "refresh": 2,
         "regex": "",
@@ -400,6 +403,6 @@
   "timezone": "",
   "title": "API Service - Logs",
   "uid": "api-service-logs",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

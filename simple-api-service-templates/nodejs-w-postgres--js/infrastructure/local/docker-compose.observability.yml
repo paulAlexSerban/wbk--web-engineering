@@ -11,7 +11,7 @@ services:
     image: grafana/loki:3.7.8
     container_name: ${PROJECT_NAME}_loki
     volumes:
-      - ../../observability/loki/config.yaml:/etc/loki/config.yaml:ro
+      - ../../observability/loki/loki-config.yaml:/etc/loki/config.yaml:ro
       - loki-data:/loki/data
     environment:
       LOG_LEVEL: info

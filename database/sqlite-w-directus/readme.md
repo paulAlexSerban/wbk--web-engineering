@@ -21,7 +21,7 @@ Introspection is Directus' way of scanning your existing database schema and cre
 
 - You already have an existing database schema (legacy or custom).
 - You want to add Directus as a headless CMS or data management layer **without** redesigning your database.
-- You don’t want Directus to "own" your schema — you just want it to reflect it.
+- You don’t want Directus to "own" your schema - you just want it to reflect it.
 
 ### 🧩 How It Works
 
@@ -77,7 +77,7 @@ From the Directus Admin App:
   - Create fields for each column
   - Attempt to detect foreign keys and relationships
 
-✅ **No actual changes** are made to the underlying tables — this is metadata-only.
+✅ **No actual changes** are made to the underlying tables - this is metadata-only.
 
 #### 3. **Customize Fields/Collections**
 

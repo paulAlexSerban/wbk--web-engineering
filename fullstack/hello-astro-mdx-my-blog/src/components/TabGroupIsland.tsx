@@ -6,7 +6,7 @@ interface TabGroupProps {
 }
 
 /**
- * CSS-only tabs — no client hydration required, works with global MDX injection.
+ * CSS-only tabs - no client hydration required, works with global MDX injection.
  */
 export const TabGroup: React.FC<TabGroupProps> = ({ tabs, children }) => {
   const panels = React.Children.toArray(children);
