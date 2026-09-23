@@ -35,10 +35,10 @@ compose_down_clean: backup_db
 	$(COMPOSE_ALL) down -v
 
 observability_up:
-	$(COMPOSE_OBS) up -d clickhouse otel-collector grafana
+	$(COMPOSE_OBS) up -d loki alloy grafana
 
 observability_down:
-	$(COMPOSE_OBS) stop clickhouse otel-collector grafana
+	$(COMPOSE_OBS) stop loki alloy grafana
 
 notebook_up:
 	$(COMPOSE_ALL) up -d --build jupyter

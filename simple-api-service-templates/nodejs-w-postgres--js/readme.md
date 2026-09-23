@@ -7,16 +7,16 @@ Minimal Express API + PostgreSQL wrapped in the shared Dev & Test harness from [
 - API: Node.js, Express, JavaScript
 - Database: PostgreSQL 18
 - Harness: Docker Compose (split by domain), Makefile, SQL seeder, Jupyter HTTP notebook, k6
-- Observability: OpenTelemetry Collector + ClickHouse + Grafana. The API emits structured logs via Pino (`pino-opentelemetry-transport`) over OTLP gRPC to the collector, which stores them in ClickHouse (`otel_logs`). Grafana is provisioned with a ClickHouse datasource and the **API Service - Logs** dashboard.
+- Observability: Grafana Alloy + Loki + Grafana. The API emits structured logs via Pino to the collector, which stores them in Loki. Grafana is provisioned with a Loki datasource and the **API Service - Logs** dashboard.
 
 Compose files:
 
-| File                               | Domain                                              |
-| ---------------------------------- | --------------------------------------------------- |
-| `docker-compose.yml`               | Template runtime: API, Postgres, pgAdmin            |
-| `docker-compose.performance.yml`   | k6 load tests                                       |
-| `docker-compose.notebook.yml`      | JupyterLab for HTTP / contract checks               |
-| `docker-compose.observability.yml` | ClickHouse, OTel Collector, Grafana                 |
+| File                               | Domain                                   |
+| ---------------------------------- | ---------------------------------------- |
+| `docker-compose.yml`               | Template runtime: API, Postgres, pgAdmin |
+| `docker-compose.performance.yml`   | k6 load tests                            |
+| `docker-compose.notebook.yml`      | JupyterLab for HTTP / contract checks    |
+| `docker-compose.observability.yml` | Grafana Alloy, Loki, Grafana             |
 
 ## Quick start
 
@@ -34,7 +34,7 @@ make notebook_up
 make observability_up
 ```
 
-`make observability_up` starts ClickHouse, the collector, and Grafana. The API already exports OTLP logs to `otel-collector:4317`; they land in Grafana once the stack is up. Config lives in [`observability/`](observability/). Stop the stack with `make observability_down` (it is not included in `make compose_down`).
+`make observability_up` starts Grafana Alloy, Loki, and Grafana. The API already exports structured logs to the collector; they land in Grafana once the stack is up. Config lives in [`observability/`](observability/). Stop the stack with `make observability_down` (it is not included in `make compose_down`).
 
 | Piece            | URL / command                                                                |
 | ---------------- | ---------------------------------------------------------------------------- |
@@ -44,7 +44,7 @@ make observability_up
 | JupyterLab       | http://localhost:8888 (token: `JUPYTER_TOKEN`)                               |
 | Jupyter notebook | [notebooks/requests.ipynb](notebooks/requests.ipynb)                         |
 | Grafana          | http://localhost:3001 (`GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`)      |
-| ClickHouse HTTP  | http://localhost:8123                                                        |
+| Loki HTTP        | http://localhost:8123                                                        |
 | OTel Collector   | gRPC `:4317`, HTTP `:4318`                                                   |
 
 Stop everything with `make compose_down` (and `make observability_down` if you started it). `make compose_down_clean` backs up the database then removes volumes.
@@ -66,7 +66,7 @@ Stop everything with `make compose_down` (and `make observability_down` if you s
 | `compose_up`                              | Build and start API + Postgres + pgAdmin                             |
 | `compose_down`                            | Stop runtime, notebook, and k6 compose files                         |
 | `compose_down_clean`                      | Backup DB, then `down -v`                                            |
-| `observability_up` / `observability_down` | Start / stop ClickHouse, OTel Collector, and Grafana                 |
+| `observability_up` / `observability_down` | Start / stop Grafana Alloy, Loki, and Grafana                        |
 | `notebook_up` / `notebook_down`           | Build and start / stop JupyterLab                                    |
 | `seed`                                    | Apply `database/seeds/seed.sql` to the running database              |
 | `backup_db` / `restore_db`                | Dump / restore `database/backup/main.sql`                            |

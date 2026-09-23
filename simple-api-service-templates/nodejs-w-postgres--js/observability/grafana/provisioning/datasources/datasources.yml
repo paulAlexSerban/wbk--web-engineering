@@ -1,17 +1,13 @@
 apiVersion: 1
 
 datasources:
-  - name: ClickHouse
-    type: grafana-clickhouse-datasource
+  - name: Loki
+    type: loki
     access: proxy
-    uid: clickhouse
+    url: http://loki:3100
+    uid: loki
     isDefault: true
     editable: false
     jsonData:
-      host: clickhouse
-      port: 9000
-      protocol: native
-      username: $CLICKHOUSE_USER
-      defaultDatabase: $CLICKHOUSE_DB
-    secureJsonData:
-      password: $CLICKHOUSE_PASSWORD
+      url: http://loki:3100
+      maxLines: 1000
