@@ -12,17 +12,17 @@ Each template is a minimal **API + database**. Every template is wrapped in the 
 
 |         | PostgreSQL | MongoDB | SQLite | MariaDB | Redis |
 | ------- | ---------- | ------- | ------ | ------- | ----- |
-| Node.js | ✅          | ❌       | ❌      | ❌       | ❌     |
-| Python  | ❌          | ❌       | ❌      | ❌       | ❌     |
-| Ruby    | ❌          | ❌       | ❌      | ❌       | ❌     |
-| Rust    | ❌          | ❌       | ❌      | ❌       | ❌     |
-| Go      | ❌          | ❌       | ❌      | ❌       | ❌     |
-| PHP     | ❌          | ❌       | ❌      | ❌       | ❌     |
-| Java    | ❌          | ❌       | ❌      | ❌       | ❌     |
+| Node.js | ✅         | ❌      | ❌     | ❌      | ❌    |
+| Python  | ❌         | ❌      | ❌     | ❌      | ❌    |
+| Ruby    | ❌         | ❌      | ❌     | ❌      | ❌    |
+| Rust    | ❌         | ❌      | ❌     | ❌      | ❌    |
+| Go      | ❌         | ❌      | ❌     | ❌      | ❌    |
+| PHP     | ❌         | ❌      | ❌     | ❌      | ❌    |
+| Java    | ❌         | ❌      | ❌     | ❌      | ❌    |
 
 ## Dev & Test Harness
 
-The Dev & Test (D&T) harness is the shared local environment that ships with every template. It is **not** the API itself — it is the repeatable wrapper around the API: orchestrate, seed, test, observe.
+The Dev & Test (D&T) harness is the shared local environment that ships with every template. It is **not** the API itself - it is the repeatable wrapper around the API: orchestrate, seed, test, observe.
 
 Docker Compose is the single entrypoint. It brings up the template runtime (API + database) plus the harness tools so the same workflow works across languages.
 
@@ -40,7 +40,7 @@ The solution is the template runtime inside the harness: harness tools drive the
 
 ```mermaid
 flowchart LR
-        subgraph Harness["Dev and Test Harness — Docker Compose"]
+        subgraph Harness["Dev and Test Harness - Docker Compose"]
         direction LR
 
         subgraph Tools["Harness tools"]
