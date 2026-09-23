@@ -25,7 +25,7 @@ services:
         - LOCAL_BASE_IMAGE=${PROJECT_NAME}-local-base:latest
         - NODE_PORT=${NODE_PORT}
     ports:
-      - "3002:${NODE_PORT}"
+      - "3000:${NODE_PORT}"
     depends_on:
       - database
     env_file:
