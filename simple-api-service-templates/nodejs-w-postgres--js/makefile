@@ -49,6 +49,13 @@ notebook_up:
 notebook_down:
 	$(COMPOSE_ALL) stop jupyter
 
+compose_down_all_clean: backup_db observability_down notebook_down compose_down
+	docker volume prune -f
+	docker network prune -f
+	docker system prune -f
+	docker image prune -f
+	docker container prune -f
+
 seed:
 	docker exec -i ${COMPOSE_PROJECT_NAME}_postgres \
 		psql -U ${DATABASE_USER} -d ${DATABASE_NAME} \

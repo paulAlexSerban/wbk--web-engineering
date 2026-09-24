@@ -14,7 +14,7 @@ app.use(pinoHttp({
   genReqId: (req) => req.headers['x-request-id']?.toString() || randomUUID(),
   // attributes here become structured fields, not string concatenation
   customProps: req => ({ route: req.route?.path }),
-  customLogLevel: (res, err) => {
+  customLogLevel: (req, res, err) => {
     if (res.statusCode >= 400 && res.statusCode < 500) {
       return 'warn';
     }
