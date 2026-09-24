@@ -1,0 +1,19 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: page
+    receivers:
+      - uid: page_email
+        type: email
+        settings:
+          addresses: oncall@localhost
+          singleEmail: true
+  - orgId: 1
+    name: ticket
+    receivers:
+      - uid: ticket_email
+        type: email
+        settings:
+          addresses: backlog@localhost
+          singleEmail: true

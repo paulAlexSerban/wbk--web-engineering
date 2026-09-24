@@ -1,0 +1,227 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: api-service
+    folder: API Service
+    interval: 1m
+    rules:
+      - uid: api_server_error_rate
+        title: API server error rate
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: loki
+            model:
+              datasource:
+                type: loki
+                uid: loki
+              editorMode: code
+              expr: |
+                sum by (route, code) (
+                  count_over_time(
+                    {service="api-service", level=~"error|fatal"}
+                    | json route="route", code="err.code"
+                    | code!~"23505|23503"
+                    | label_format route=`{{ or .route "unknown" }}`, code=`{{ or .code "none" }}`
+                    [5m]
+                  )
+                )
+              instant: true
+              queryType: instant
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              type: reduce
+              settings:
+                mode: dropNN
+          - refId: C
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              refId: C
+              type: threshold
+              conditions:
+                - evaluator:
+                    params:
+                      - 5
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    type: last
+                  type: query
+        dashboardUid: api-service-logs
+        panelId: 201
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Page. Server errors on api-service stayed above 5 in 5 minutes.
+          description: route={{ $labels.route }} err.code={{ $labels.code }}. Unique violations (23505) and foreign-key violations (23503) are excluded.
+        labels:
+          severity: critical
+          page: "true"
+          service: api-service
+        isPaused: false
+
+      - uid: api_sku_conflict_ratio
+        title: Product SKU conflict ratio
+        condition: F
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 900
+              to: 0
+            datasourceUid: loki
+            model:
+              datasource:
+                type: loki
+                uid: loki
+              editorMode: code
+              expr: |
+                sum(
+                  count_over_time(
+                    {service="api-service", level="info"}
+                    | json route="route", method="req.method", status="res.statusCode"
+                    | route="/api/products"
+                    | method="POST"
+                    | status="201"
+                    [15m]
+                  )
+                )
+                or sum(count_over_time({service="api-service"}[15m])) * 0
+              instant: true
+              queryType: instant
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 900
+              to: 0
+            datasourceUid: loki
+            model:
+              datasource:
+                type: loki
+                uid: loki
+              editorMode: code
+              expr: |
+                sum(
+                  count_over_time(
+                    {service="api-service", level="warn"}
+                    | json route="route", code="err.code", constraint="err.constraint"
+                    | route="/api/products"
+                    | code="23505"
+                    | constraint="products_sku_key"
+                    [15m]
+                  )
+                )
+                or sum(count_over_time({service="api-service"}[15m])) * 0
+              instant: true
+              queryType: instant
+              refId: B
+          - refId: C
+            relativeTimeRange:
+              from: 900
+              to: 0
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: C
+              type: reduce
+              settings:
+                mode: replaceNN
+                replaceWithValue: 0
+          - refId: D
+            relativeTimeRange:
+              from: 900
+              to: 0
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              reducer: last
+              refId: D
+              type: reduce
+              settings:
+                mode: replaceNN
+                replaceWithValue: 0
+          - refId: E
+            relativeTimeRange:
+              from: 900
+              to: 0
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $D / ($C + $D + 1e-9)
+              refId: E
+              type: math
+          - refId: F
+            relativeTimeRange:
+              from: 900
+              to: 0
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: E
+              refId: F
+              type: threshold
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.01
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - F
+                  reducer:
+                    type: last
+                  type: query
+        dashboardUid: api-service-logs
+        panelId: 207
+        noDataState: OK
+        execErrState: Error
+        for: 15m
+        annotations:
+          summary: Ticket, do not page. Product SKU conflict ratio stayed above 1% for 15 minutes.
+          description: route=/api/products constraint=products_sku_key ratio={{ $values.E }}. Widen SKU randomness. A single collision is not this alert.
+        labels:
+          severity: warning
+          page: "false"
+          service: api-service
+          route: /api/products
+          constraint: products_sku_key
+        isPaused: false
