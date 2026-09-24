@@ -1,8 +1,5 @@
 import pino from 'pino';
 
-process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT ??= process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://otel-collector:4317';
-process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??= 'grpc';
-
 const ERR_FIELDS_TO_OMIT = ['detail', 'where', 'internalQuery', 'hint'];
 
 function omitErrFields(serialized) {
