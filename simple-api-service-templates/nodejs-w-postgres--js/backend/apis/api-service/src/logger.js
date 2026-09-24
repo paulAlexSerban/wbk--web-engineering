@@ -40,3 +40,18 @@ export const logger = pino({
   },
   redact: ['req.headers.authorization', 'req.headers.cookie'],
 });
+
+const asError = (reason) => {
+  if (reason instanceof Error) return reason;
+  return new Error(typeof reason === 'string' ? reason : 'unhandled rejection');
+};
+
+process.on('uncaughtException', (err) => {
+  logger.fatal({ err }, 'uncaught exception');
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  logger.fatal({ err: asError(reason) }, 'unhandled rejection');
+  process.exit(1);
+});

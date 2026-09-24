@@ -49,12 +49,15 @@ notebook_up:
 notebook_down:
 	$(COMPOSE_ALL) stop jupyter
 
+notebook_down_clean:
+	$(COMPOSE_ALL) down -v
+
 compose_all_up: services_up observability_up notebook_up
 
-compose_down_all_clean: backup_db observability_down notebook_down services_down
-	docker volume prune -f
+compose_down_all_clean: backup_db observability_down_clean notebook_down_clean services_down_clean
+	docker volume prune -fa
+	docker system prune -fa
 	docker network prune -f
-	docker system prune -f
 	docker image prune -f
 	docker container prune -f
 

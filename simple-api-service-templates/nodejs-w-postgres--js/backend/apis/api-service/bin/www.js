@@ -2,11 +2,9 @@
  * Module dependencies.
  */
 
-import app from "../src/app.js";
-import debug from "debug";
-const PROJECT_NAME = process.env.PROJECT_NAME || "backend-api";
-const debugLog = debug(`${PROJECT_NAME}:server`);
 import http from "http";
+import app from "../src/app.js";
+import { logger } from "../src/logger.js";
 
 /**
  * Normalize a port into a number, string, or false.
@@ -37,21 +35,16 @@ const onError = (error) => {
     throw error;
   }
 
-  const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+  const bind = typeof port === "string" ? `pipe ${port}` : `port ${port}`;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case "EACCES":
-      console.error(bind + " requires elevated privileges");
-      process.exit(1);
-      break;
-    case "EADDRINUSE":
-      console.error(bind + " is already in use");
-      process.exit(1);
-      break;
-    default:
-      throw error;
+  if (error.code === "EACCES") {
+    logger.fatal({ err: error, port }, `${bind} requires elevated privileges`);
+  } else if (error.code === "EADDRINUSE") {
+    logger.fatal({ err: error, port }, `${bind} is already in use`);
+  } else {
+    logger.fatal({ err: error, port }, `${bind} failed to listen`);
   }
+  process.exit(1);
 };
 
 /**
@@ -66,9 +59,11 @@ app.set("port", port);
  */
 
 const onListening = () => {
-  const addr = server.address();
-  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr?.port;
-  debugLog("Listening on " + bind);
+  const address = server.address();
+  logger.info(
+    typeof address === "string" ? { address } : { port: address?.port },
+    "listening",
+  );
 };
 
 /**

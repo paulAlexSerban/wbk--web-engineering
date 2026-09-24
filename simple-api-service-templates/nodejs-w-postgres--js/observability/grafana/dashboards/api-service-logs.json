@@ -902,7 +902,6 @@
             "uid": "__expr__"
           },
           "expression": "$B / ($A + $B + 1e-9)",
-          "hide": false,
           "refId": "C",
           "type": "math"
         }
@@ -1046,8 +1045,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "API Service - Logs",
+  "title": "Logs",
   "uid": "api-service-logs",
-  "version": 12,
+  "version": 3,
   "weekStart": ""
 }

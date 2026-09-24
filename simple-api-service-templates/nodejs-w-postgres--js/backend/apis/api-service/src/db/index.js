@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 
+import { logger } from '../logger.js';
 import {
     POSTGRES_USER,
     POSTGRES_HOST,
@@ -22,3 +23,7 @@ const poolConfig = {
 };
 
 export const pool = new Pool(poolConfig);
+
+pool.on('error', (err) => {
+  logger.error({ err }, 'idle database client error');
+});
