@@ -12,6 +12,9 @@ const app = express();
 app.use(pinoHttp({
   logger,
   genReqId: (req) => req.headers['x-request-id']?.toString() || randomUUID(),
+  autoLogging: {
+    ignore: (req) => req.path === '/health' || req.path === '/health/',
+  },
   // attributes here become structured fields, not string concatenation
   customProps: req => ({ route: req.route?.path }),
   customLogLevel: (req, res, err) => {

@@ -25,13 +25,13 @@ COMPOSE_OBS := $(COMPOSE) \
 local_base_build:
 	$(COMPOSE) --profile build-only build local-base
 
-compose_up: local_base_build
+services_up: local_base_build
 	$(COMPOSE_ALL) up -d --build api-service database pgadmin
 
-compose_down:
+services_down:
 	$(COMPOSE_ALL) down
 
-compose_down_clean: backup_db
+services_down_clean: backup_db
 	$(COMPOSE_ALL) down -v
 
 observability_up:
@@ -49,7 +49,9 @@ notebook_up:
 notebook_down:
 	$(COMPOSE_ALL) stop jupyter
 
-compose_down_all_clean: backup_db observability_down notebook_down compose_down
+compose_all_up: services_up observability_up notebook_up
+
+compose_down_all_clean: backup_db observability_down notebook_down services_down
 	docker volume prune -f
 	docker network prune -f
 	docker system prune -f
