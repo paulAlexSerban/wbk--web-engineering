@@ -14,7 +14,6 @@ const router = express.Router();
 router.get(
   "/",
   asyncHandler(async (_req, res) => {
-    res.log.info("listing order items");
     res.json(await listOrderItems());
   }),
 );
@@ -22,7 +21,6 @@ router.get(
 router.get(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({orderItemId: req.params.id}, "listing order item by id");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({orderItemId: req.params.id}, "invalid order item id");
@@ -37,7 +35,6 @@ router.get(
       return;
     }
 
-    res.log.info({orderItemId: req.params.id}, "order item found");
     res.json(item);
   }),
 );
@@ -45,7 +42,6 @@ router.get(
 router.post(
   "/",
   asyncHandler(async (req, res) => {
-    res.log.info("creating order item");
     const { order_id, product_id, quantity, unit_price_cents } = req.body;
     if (!order_id || !product_id || quantity === undefined || unit_price_cents === undefined) {
       res.log.warn("order_id, product_id, quantity, and unit_price_cents are required");
@@ -61,7 +57,6 @@ router.post(
       quantity,
       unit_price_cents,
     });
-    res.log.info("order item created");
     res.status(201).json(item);
   }),
 );
@@ -69,7 +64,6 @@ router.post(
 router.put(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({orderItemId: req.params.id}, "updating order item");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({orderItemId: req.params.id}, "invalid order item id");
@@ -98,7 +92,6 @@ router.put(
       return;
     }
 
-    res.log.info({orderItemId: req.params.id}, "order item updated");
     res.json(item);
   }),
 );
@@ -106,7 +99,6 @@ router.put(
 router.patch(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({orderItemId: req.params.id}, "patching order item");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({orderItemId: req.params.id}, "invalid order item id");
@@ -121,7 +113,6 @@ router.patch(
       return;
     }
 
-    res.log.info({orderItemId: req.params.id}, "order item patched");
     res.json(item);
   }),
 );
@@ -129,7 +120,6 @@ router.patch(
 router.delete(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({orderItemId: req.params.id}, "deleting order item");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({orderItemId: req.params.id}, "invalid order item id");
@@ -144,7 +134,6 @@ router.delete(
       return;
     }
 
-    res.log.info({orderItemId: req.params.id}, "order item deleted");
     res.json(item);
   }),
 );

@@ -9,9 +9,7 @@ export async function listProducts() {
   return rows;
 }
 
-export async function findProductById(
-  id,
-) {
+export async function findProductById(id) {
   const { rows } = await pool.query(
     `SELECT ${PRODUCT_COLUMNS} FROM products WHERE id = $1`,
     [id],
@@ -27,10 +25,7 @@ export async function createProduct(input) {
   return rows[0];
 }
 
-export async function updateProduct(
-  id,
-  input,
-) {
+export async function updateProduct(id, input) {
   const { rows } = await pool.query(
     `UPDATE products SET sku = $1, name = $2, unit_price_cents = $3 WHERE id = $4 RETURNING ${PRODUCT_COLUMNS}`,
     [input.sku, input.name, input.unit_price_cents, id],
@@ -38,10 +33,7 @@ export async function updateProduct(
   return rows[0];
 }
 
-export async function patchProduct(
-  id,
-  input,
-) {
+export async function patchProduct(id, input) {
   const { rows } = await pool.query(
     `UPDATE products
      SET sku = COALESCE($1, sku),
@@ -54,9 +46,7 @@ export async function patchProduct(
   return rows[0];
 }
 
-export async function deleteProduct(
-  id,
-) {
+export async function deleteProduct(id) {
   const { rows } = await pool.query(
     `DELETE FROM products WHERE id = $1 RETURNING ${PRODUCT_COLUMNS}`,
     [id],
@@ -64,9 +54,7 @@ export async function deleteProduct(
   return rows[0];
 }
 
-export async function countOrderItemsByProductId(
-  productId,
-) {
+export async function countOrderItemsByProductId(productId) {
   const { rows } = await pool.query(
     "SELECT COUNT(*)::text AS count FROM order_items WHERE product_id = $1",
     [productId],

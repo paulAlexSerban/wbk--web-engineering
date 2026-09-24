@@ -1,9 +1,5 @@
 import { pool } from "../db/index.js";
 
-
-
-
-
 export async function listOrders() {
   const { rows } = await pool.query(
     "SELECT id, customer_id, status, created_at FROM orders ORDER BY id",
@@ -11,9 +7,7 @@ export async function listOrders() {
   return rows;
 }
 
-export async function listOrdersByCustomerId(
-  customerId,
-) {
+export async function listOrdersByCustomerId(customerId) {
   const { rows } = await pool.query(
     "SELECT id, customer_id, status, created_at FROM orders WHERE customer_id = $1 ORDER BY id",
     [customerId],
@@ -37,10 +31,7 @@ export async function createOrder(input) {
   return rows[0];
 }
 
-export async function updateOrder(
-  id,
-  input,
-) {
+export async function updateOrder(id, input) {
   const { rows } = await pool.query(
     "UPDATE orders SET customer_id = $1, status = $2 WHERE id = $3 RETURNING id, customer_id, status, created_at",
     [input.customer_id, input.status ?? "pending", id],
@@ -48,10 +39,7 @@ export async function updateOrder(
   return rows[0];
 }
 
-export async function patchOrder(
-  id,
-  input,
-) {
+export async function patchOrder(id, input) {
   const { rows } = await pool.query(
     `UPDATE orders
      SET customer_id = COALESCE($1, customer_id),

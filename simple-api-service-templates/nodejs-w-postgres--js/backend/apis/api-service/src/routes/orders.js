@@ -21,7 +21,6 @@ const isOrderStatus = (value) =>
 router.get(
   "/",
   asyncHandler(async (_req, res) => {
-    res.log.info("listing orders");
     res.json(await listOrders());
   }),
 );
@@ -29,7 +28,6 @@ router.get(
 router.get(
   "/pending-totals",
   asyncHandler(async (_req, res) => {
-    res.log.info("listing pending order totals");
     res.json(await listPendingOrderTotals());
   }),
 );
@@ -37,7 +35,6 @@ router.get(
 router.get(
   "/:id/items",
   asyncHandler(async (req, res) => {
-    res.log.info({orderId: req.params.id}, "listing order items by order id");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({orderId: req.params.id}, "invalid order id");
@@ -52,7 +49,6 @@ router.get(
       return;
     }
 
-    res.log.info({orderId: req.params.id}, "listing order items by order id");
     res.json(await listOrderItemsByOrderId(id));
   }),
 );
@@ -60,7 +56,6 @@ router.get(
 router.get(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({orderId: req.params.id}, "listing order by id");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({orderId: req.params.id}, "invalid order id");
@@ -75,7 +70,6 @@ router.get(
       return;
     }
 
-    res.log.info({orderId: req.params.id}, "listing order by id");
     res.json(order);
   }),
 );
@@ -83,7 +77,6 @@ router.get(
 router.post(
   "/",
   asyncHandler(async (req, res) => {
-    res.log.info("creating order");
     const { customer_id, status } = req.body;
     if (!customer_id) {
       res.log.warn("customer_id is required");
@@ -97,7 +90,6 @@ router.post(
     }
 
     const order = await createOrder({ customer_id, status });
-    res.log.info("order created");
     res.status(201).json(order);
   }),
 );
@@ -105,7 +97,6 @@ router.post(
 router.put(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({orderId: req.params.id}, "updating order");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({orderId: req.params.id}, "invalid order id");
@@ -132,7 +123,6 @@ router.put(
       return;
     }
 
-    res.log.info({orderId: req.params.id}, "order updated");
     res.json(order);
   }),
 );
@@ -140,7 +130,6 @@ router.put(
 router.patch(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({orderId: req.params.id}, "patching order");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({orderId: req.params.id}, "invalid order id");
@@ -162,7 +151,6 @@ router.patch(
       return;
     }
 
-    res.log.info({orderId: req.params.id}, "order patched");
     res.json(order);
   }),
 );
@@ -170,7 +158,6 @@ router.patch(
 router.delete(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({orderId: req.params.id}, "deleting order");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({orderId: req.params.id}, "invalid order id");
@@ -185,7 +172,6 @@ router.delete(
       return;
     }
 
-    res.log.info({orderId: req.params.id}, "order deleted");
     res.json(order);
   }),
 );

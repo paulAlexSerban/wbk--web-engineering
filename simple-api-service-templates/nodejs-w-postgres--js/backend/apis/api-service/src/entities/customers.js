@@ -3,10 +3,6 @@ import bcrypt from "bcryptjs";
 
 const BCRYPT_ROUNDS = 10;
 
-
-
-
-
 const CUSTOMER_COLUMNS = "id, email, created_at";
 
 export async function listCustomers() {
@@ -16,9 +12,7 @@ export async function listCustomers() {
   return rows;
 }
 
-export async function findCustomerById(
-  id
-) {
+export async function findCustomerById(id) {
   const { rows } = await pool.query(
     `SELECT ${CUSTOMER_COLUMNS} FROM customers WHERE id = $1`,
     [id],
@@ -35,10 +29,7 @@ export async function createCustomer(input) {
   return rows[0];
 }
 
-export async function updateCustomer(
-  id,
-  input,
-) {
+export async function updateCustomer(id, input) {
   const password_hash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
   const { rows } = await pool.query(
     `UPDATE customers SET email = $1, password_hash = $2 WHERE id = $3 RETURNING ${CUSTOMER_COLUMNS}`,
@@ -47,15 +38,12 @@ export async function updateCustomer(
   return rows[0];
 }
 
-export async function patchCustomer(
-  id,
-  input,
-) {
+export async function patchCustomer(id, input) {
   const password_hash =
     input.password === undefined
       ? null
       : await bcrypt.hash(input.password, BCRYPT_ROUNDS);
-      const { rows } = await pool.query(
+  const { rows } = await pool.query(
     `UPDATE customers
      SET email = COALESCE($1, email),
          password_hash = COALESCE($2, password_hash)
@@ -66,9 +54,7 @@ export async function patchCustomer(
   return rows[0];
 }
 
-export async function deleteCustomer(
-  id,
-) {
+export async function deleteCustomer(id) {
   const { rows } = await pool.query(
     `DELETE FROM customers WHERE id = $1 RETURNING ${CUSTOMER_COLUMNS}`,
     [id],

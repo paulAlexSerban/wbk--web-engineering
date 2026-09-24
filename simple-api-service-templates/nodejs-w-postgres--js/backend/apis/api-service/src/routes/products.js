@@ -15,7 +15,6 @@ const router = express.Router();
 router.get(
   "/",
   asyncHandler(async (_req, res) => {
-    res.log.info("listing products");
     res.json(await listProducts());
   }),
 );
@@ -23,7 +22,6 @@ router.get(
 router.get(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({productId: req.params.id}, "listing product by id");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({productId: req.params.id}, "invalid product id");
@@ -38,7 +36,6 @@ router.get(
       return;
     }
 
-    res.log.info({productId: req.params.id}, "product found");
     res.json(product);
   }),
 );
@@ -46,7 +43,6 @@ router.get(
 router.post(
   "/",
   asyncHandler(async (req, res) => {
-    res.log.info("creating product");
     const { sku, name, unit_price_cents } = req.body;
     if (!sku || !name || unit_price_cents === undefined) {
       res.log.warn("sku, name, and unit_price_cents are required");
@@ -57,7 +53,6 @@ router.post(
     }
 
     const product = await createProduct({ sku, name, unit_price_cents });
-    res.log.info("product created");
     res.status(201).json(product);
   }),
 );
@@ -65,7 +60,6 @@ router.post(
 router.put(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({productId: req.params.id}, "updating product");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({productId: req.params.id}, "invalid product id");
@@ -89,7 +83,6 @@ router.put(
       return;
     }
 
-    res.log.info({productId: req.params.id}, "product updated");
     res.json(product);
   }),
 );
@@ -97,7 +90,6 @@ router.put(
 router.patch(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({productId: req.params.id}, "patching product");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({productId: req.params.id}, "invalid product id");
@@ -112,7 +104,6 @@ router.patch(
       return;
     }
 
-    res.log.info({productId: req.params.id}, "product patched");
     res.json(product);
   }),
 );
@@ -120,7 +111,6 @@ router.patch(
 router.delete(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({productId: req.params.id}, "deleting product");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({productId: req.params.id}, "invalid product id");
@@ -145,7 +135,6 @@ router.delete(
     }
 
     const deleted = await deleteProduct(id);
-    res.log.info({productId: req.params.id}, "product deleted");
     res.json(deleted);
   }),
 );

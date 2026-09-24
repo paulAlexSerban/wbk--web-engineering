@@ -15,7 +15,6 @@ const router = express.Router();
 router.get(
   "/",
   asyncHandler(async (_req, res) => {
-    res.log.info("listing customers");
     res.json(await listCustomers());
   }),
 );
@@ -23,7 +22,6 @@ router.get(
 router.get(
   "/:id/orders",
   asyncHandler(async (req, res) => {
-    res.log.info({customerId: req.params.id},"listing orders by customer id");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({customerId: req.params.id}, "invalid customer id");
@@ -38,7 +36,6 @@ router.get(
       return;
     }
 
-    res.log.info({customerId: req.params.id}, "listing orders by customer id");
     res.json(await listOrdersByCustomerId(id));
   }),
 );
@@ -46,7 +43,6 @@ router.get(
 router.get(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({customerId: req.params.id}, "listing customer by id");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({customerId: req.params.id}, "invalid customer id");
@@ -59,11 +55,8 @@ router.get(
       res.log.warn({customerId: req.params.id}, "customer not found");
       res.status(404).json({ error: "Customer not found" });
       return;
-    } else {
-      res.log.info({customerId: req.params.id}, "customer found");
     }
 
-    res.log.info({customerId: req.params.id}, "listing customer by id");
     res.json(customer);
   }),
 );
@@ -71,7 +64,6 @@ router.get(
 router.post(
   "/",
   asyncHandler(async (req, res) => {
-    res.log.info("creating customer");
     const { email, password } = req.body;
     if (!email || !password) {
       res.log.warn("email and password are required");
@@ -80,7 +72,6 @@ router.post(
     }
 
     const customer = await createCustomer({ email, password });
-    res.log.info("customer created");
     res.status(201).json(customer);
   }),
 );
@@ -88,7 +79,6 @@ router.post(
 router.put(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({customerId: req.params.id}, "updating customer");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({customerId: req.params.id}, "invalid customer id");
@@ -110,7 +100,6 @@ router.put(
       return;
     }
 
-    res.log.info({customerId: req.params.id}, "customer updated");
     res.json(customer);
   }),
 );
@@ -118,7 +107,6 @@ router.put(
 router.patch(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({customerId: req.params.id}, "patching customer");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({customerId: req.params.id}, "invalid customer id");
@@ -133,7 +121,6 @@ router.patch(
       return;
     }
 
-    res.log.info({customerId: req.params.id}, "customer patched");
     res.json(customer);
   }),
 );
@@ -141,7 +128,6 @@ router.patch(
 router.delete(
   "/:id",
   asyncHandler(async (req, res) => {
-    res.log.info({customerId: req.params.id}, "deleting customer");
     const id = parseId(req.params.id);
     if (id === null) {
       res.log.warn({customerId: req.params.id}, "invalid customer id");
@@ -156,7 +142,6 @@ router.delete(
       return;
     }
 
-    res.log.info({customerId: req.params.id}, "customer deleted");
     res.json(customer);
   }),
 );
