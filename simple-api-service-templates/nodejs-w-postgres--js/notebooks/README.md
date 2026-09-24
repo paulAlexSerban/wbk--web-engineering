@@ -13,6 +13,7 @@ Customers own signup (`email` + `password`). Products are a catalog (`sku`, `nam
 | [02_order_checkout_flow.ipynb](02_order_checkout_flow.ipynb)         | One customer: create catalog products → order → line items → pending totals → `pending → shipped → delivered` → totals drop the order.          |
 | [03_bulk_products_seed.ipynb](03_bulk_products_seed.ipynb)           | Several customers and orders, then many Faker catalog products sold as line items; checks item counts and pending totals.                       |
 | [04_cleanup_and_error_paths.ipynb](04_cleanup_and_error_paths.ipynb) | 400s (bad id, missing fields, invalid status), 404s, product 409, explicit teardown, and customer cascade delete.                               |
+| [05_conflict_responses.ipynb](05_conflict_responses.ipynb)           | 409s: duplicate email and SKU, missing order and line-item foreign keys, and deleting a product an order-item still references.                |
 | [requests.ipynb](requests.ipynb)                                     | Small scratch pad for one-off `GET`/`POST` against the same `/api` routes.                                                                      |
 
 Out of scope: `/health`, `/api/hello` (demo-only), and k6 (`make perf_smoke` / `make perf_load`).

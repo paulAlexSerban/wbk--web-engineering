@@ -2,10 +2,17 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import pinoHttp from 'pino-http';
 import { randomUUID } from 'node:crypto';
-import { logger } from './logger.js';
+import { logger, stripSerializedErr } from './logger.js';
 import routes from './routes/index.js';
 import healthRouter from './routes/health.js';
 import { errorHandler } from './middleware/index.js';
+
+const routeTemplate = (req) => {
+  if (!req.route) return undefined;
+  const path = req.route.path ?? '';
+  if (path === '/' || path === '') return req.baseUrl || '/';
+  return `${req.baseUrl}${path}`;
+};
 
 const app = express();
 
@@ -15,8 +22,19 @@ app.use(pinoHttp({
   autoLogging: {
     ignore: (req) => req.path === '/health' || req.path === '/health/',
   },
+  serializers: {
+    err: stripSerializedErr,
+  },
   // attributes here become structured fields, not string concatenation
-  customProps: req => ({ route: req.route?.path }),
+  customProps: (req, res) => {
+    const props = {};
+    const route = res.locals?.route || routeTemplate(req);
+    if (route) props.route = route;
+    if (res.locals?.reason) props.reason = res.locals.reason;
+    return props;
+  },
+  customErrorMessage: (_req, res) =>
+    res.statusCode >= 500 ? 'request errored' : 'request rejected',
   customLogLevel: (req, res, err) => {
     if (res.statusCode >= 400 && res.statusCode < 500) {
       return 'warn';

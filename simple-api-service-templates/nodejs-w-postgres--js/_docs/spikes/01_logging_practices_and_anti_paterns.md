@@ -48,7 +48,7 @@ The database pool has no `pool.on('error')` handler. Idle-client failures and co
   customProps: req => ({ route: req.route?.path }),
 ```
 
-On a router mounted at `/api/customers`, `req.route.path` is `/:id` or `/`. `GET /api/customers/:id`, `GET /api/products/:id`, and `GET /health` all become `/:id` or `/`. The dashboard's "top routes" panel cannot tell them apart. The low-cardinality value you want is the template, including the mount: `` `${req.baseUrl}${req.route.path}` ``, which stays `/api/customers/:id` and does not turn raw ids into Loki labels.
+On a router mounted at `/api/customers`, `req.route.path` is `/:id` or `/`. `GET /api/customers/:id`, `GET /api/products/:id`, and `GET /health` all become `/:id` or `/`. The dashboard's "top routes" panel cannot tell them apart. The low-cardinality value you want is the template, including the mount: ``${req.baseUrl}${req.route.path}``, which stays `/api/customers/:id` and does not turn raw ids into Loki labels.
 
 ## Health checks will dominate the stream
 
@@ -65,7 +65,7 @@ Compose hits `/health` every 5 seconds. The handler logs `"health check"` at inf
 One completion line per request, from `pino-http`. Put extra context on that line, do not emit a twin.
 
 - Set `autoLogging.ignore` for `/health`.
-- Set `route` to `` `${req.baseUrl}${req.route?.path ?? ''}` `` inside `customProps`.
+- Set `route` to ``${req.baseUrl}${req.route?.path ?? ''}`` inside `customProps`.
 - For a 4xx, set something like `res.locals.reason = 'invalid_id'` and read it from `customProps`. One warn line then carries `route`, status, `reqId`, and a stable reason code. Stop logging `"invalid customer id"` as its own line.
 - For a 500, assign `res.err = err` in the error handler and do not also call `res.log.error`. Add a serializer that copies `err.code` for `pg` errors.
 - Log a business line only for something the access log cannot see: customer created with `{ customerId }`, product deleted blocked by order items with `{ productId, orderItemCount }`. No passwords, no password hashes, no full bodies, no "about to…" lines.
@@ -74,3 +74,4 @@ One completion line per request, from `pino-http`. Put extra context on that lin
 - Extend `redact` to `req.body.password`, `req.body.password_hash`, `res.headers['set-cookie']`, and any query token you might add later.
 - Delete the OTEL endpoint defaults until a real transport is installed. If stdout-to-Alloy is the design, say so in the logger file and stop setting exporter env vars.
 - In development, pipe stdout through `pino-pretty`. Do not pretty-print in the process that Alloy scrapes.
+

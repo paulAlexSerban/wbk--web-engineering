@@ -3,6 +3,27 @@ import pino from 'pino';
 process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT ??= process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://otel-collector:4317';
 process.env.OTEL_EXPORTER_OTLP_LOGS_PROTOCOL ??= 'grpc';
 
+const ERR_FIELDS_TO_OMIT = ['detail', 'where', 'internalQuery', 'hint'];
+
+function omitErrFields(serialized) {
+  if (!serialized || typeof serialized !== 'object') {
+    return serialized;
+  }
+  for (const field of ERR_FIELDS_TO_OMIT) {
+    delete serialized[field];
+  }
+  return serialized;
+}
+
+export function errSerializer(err) {
+  return omitErrFields(pino.stdSerializers.err(err));
+}
+
+// pino-http runs the standard serializer first, then this one.
+export function stripSerializedErr(serialized) {
+  return omitErrFields(serialized);
+}
+
 export const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
   base: {
@@ -16,6 +37,9 @@ export const logger = pino({
         level: label,
       };
     },
+  },
+  serializers: {
+    err: errSerializer,
   },
   redact: ['req.headers.authorization', 'req.headers.cookie'],
 });
