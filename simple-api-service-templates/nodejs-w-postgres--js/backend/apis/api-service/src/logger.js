@@ -41,6 +41,7 @@ export const logger = pino({
   redact: ['req.headers.authorization', 'req.headers.cookie'],
 });
 
+
 const asError = (reason) => {
   if (reason instanceof Error) return reason;
   return new Error(typeof reason === 'string' ? reason : 'unhandled rejection');

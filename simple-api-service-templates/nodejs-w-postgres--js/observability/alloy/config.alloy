@@ -54,3 +54,19 @@ loki.write "default" {
     url = "http://loki:3100/loki/api/v1/push"
   }
 }
+
+prometheus.scrape "api_service" {
+  targets = [{
+    __address__ = "api-service:" + env("NODE_PORT"),
+    service     = "api-service",
+  }]
+  metrics_path    = "/metrics"
+  scrape_interval = "15s"
+  forward_to      = [prometheus.remote_write.mimir.receiver]
+}
+
+prometheus.remote_write "mimir" {
+  endpoint {
+    url = "http://mimir:9009/api/v1/push"
+  }
+}

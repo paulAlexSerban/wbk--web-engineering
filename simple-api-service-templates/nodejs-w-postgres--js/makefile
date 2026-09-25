@@ -35,10 +35,10 @@ services_down_clean: backup_db
 	$(COMPOSE_ALL) down -v
 
 observability_up:
-	$(COMPOSE_OBS) up -d loki alloy grafana
+	$(COMPOSE_OBS) up -d loki mimir alloy grafana
 
 observability_down:
-	$(COMPOSE_OBS) stop loki alloy grafana
+	$(COMPOSE_OBS) stop loki mimir alloy grafana
 
 observability_down_clean:
 	$(COMPOSE_OBS) down -v

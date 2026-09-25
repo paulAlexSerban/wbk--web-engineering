@@ -6,7 +6,7 @@ import { logger, stripSerializedErr } from './logger.js';
 import routes from './routes/index.js';
 import healthRouter from './routes/health.js';
 import { errorHandler } from './middleware/index.js';
-
+import { register, httpMetrics } from './metrics.js';
 const routeTemplate = (req) => {
   if (!req.route) return undefined;
   const path = req.route.path ?? '';
@@ -16,11 +16,21 @@ const routeTemplate = (req) => {
 
 const app = express();
 
+app.use(httpMetrics(routeTemplate));
+
+app.get('/metrics', async (_req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
 app.use(pinoHttp({
   logger,
   genReqId: (req) => req.headers['x-request-id']?.toString() || randomUUID(),
   autoLogging: {
-    ignore: (req) => req.path === '/health' || req.path === '/health/',
+    ignore: (req) =>
+      req.path === '/health' ||
+      req.path === '/health/' ||
+      req.path === '/metrics',
   },
   serializers: {
     err: stripSerializedErr,

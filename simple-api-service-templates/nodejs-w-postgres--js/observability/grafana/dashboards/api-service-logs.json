@@ -19,7 +19,20 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Metrics",
+      "tooltip": "API service metrics",
+      "type": "link",
+      "url": "/d/api-service-metrics"
+    }
+  ],
   "panels": [
     {
       "collapsed": false,
